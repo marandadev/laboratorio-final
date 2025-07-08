@@ -53,7 +53,8 @@ jobs:
             --format "XML" \
             --out reports \
             --scan . \
-            --failOnCVSS 5
+            --failOnCVSS 5 \
+            --disableAssembly
 
       - name: Construcción de la Imagen Docker
         run: |
