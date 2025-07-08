@@ -17,12 +17,30 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Análisis SAST (SonarCloud)
-        uses: SonarSource/sonarcloud-github-action@v1.9
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Install SonarCloud Scanner
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip
+          unzip sonar-scanner.zip
+          mv sonar-scanner-5.0.1.3006 sonar-scanner
+
+      - name: Run SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: marandadev_laboratorio-final
-          SONAR_ORGANIZATION: marandadev
+        run: |
+          ./sonar-scanner/bin/sonar-scanner \
+            -Dsonar.projectKey=marandadev_laboratorio-final \
+            -Dsonar.organization=marandadev \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${SONAR_TOKEN}
+
         with:
           projectBaseDir: .
         continue-on-error: false
